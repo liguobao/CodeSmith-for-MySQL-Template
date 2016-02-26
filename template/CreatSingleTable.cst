@@ -1,0 +1,61 @@
+﻿<%@ CodeTemplate Language="C#" ResponseEncoding="UTF-8" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="Template description here." 
+ Output="None"%>
+<%@ Register Name="Models" Template="DBMad.Models.cst" 
+	MergeProperties="False" ExcludeProperties="" %>	
+<%@ Register Name="DAL" Template="DBMad.DAL.cst" 
+MergeProperties="False" ExcludeProperties="" %>
+<%@ Register Name="BLL" Template="DBMad.BLL.cst" 
+MergeProperties="False" ExcludeProperties="" %>
+
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Optional="False"%>
+<%@ Property Name="RootNamespace" Default="Net.Itcast.CN" Type="System.String" Optional="False"%>
+
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="System.Data" %>
+<script runat="template">
+		private string _outputDirectory = String.Empty;
+		[Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+		[Description("The directory to output the results to.")]
+		public string OutputDirectory 
+		{
+			get
+			{		
+				return _outputDirectory;
+			}
+			set
+			{
+				if (value != null && !value.EndsWith("\\"))
+				{
+					value += "\\";
+			    }
+				_outputDirectory = value;
+			} 
+		}
+</script>
+<%
+    Models model = this.Create<Models>();
+	model.ModelsNamespace = this.RootNamespace+".Model";
+	model.TargetTable = this.SourceTable;
+	model.RenderToFile(this.OutputDirectory+"Model/"+model.GetFileName(),true);
+	
+
+   DAL dal = this.Create<DAL>();
+   dal.TargetTable = this.SourceTable;
+   dal.ModelsNamespace = model.ModelsNamespace;
+   dal.DALClassNameSurfix = "DAL";
+   dal.DALNamespace =this.RootNamespace+".DAL";
+   dal.RenderToFile(this.OutputDirectory+"DAL/"+dal.GetFileName(),true);
+
+   BLL bll = this.Create<BLL>();
+   bll.ModelsNamespace = model.ModelsNamespace;
+   bll.DALClassNameSurfix = dal.DALClassNameSurfix;
+   bll.DALNamespace = dal.DALNamespace;
+   bll.BLLClassNameSurfix = "BLL";
+   bll.BLLNamespace = this.RootNamespace+".BLL";
+   bll.TargetTable = this.SourceTable;
+   bll.RenderToFile(this.OutputDirectory+"BLL/"+bll.GetFileName(),true);
+
+   Response.Write("ok,see "+this.OutputDirectory);
+%>

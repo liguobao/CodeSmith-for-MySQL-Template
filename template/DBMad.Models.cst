@@ -1,0 +1,52 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" 
+	Src="ToolsCodeTemplate.cs" Inherits="ToolsCodeTemplate"%>
+<%@ Property Name="TargetTable" Type="SchemaExplorer.TableSchema" Category="Context" Description="TargetTable that the object is based on." %>
+<%@ Property Name="ModelsNamespace" Default="Model" Type="System.String" Category="Context" Description="TargetTable that the object is based on." %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="System.Data" %>
+<% PrintHeader(); %>
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace <%= ModelsNamespace %>
+{	
+	[Serializable()]
+    
+    /// <summary>
+    /// 
+    /// </summary>
+	public class <%= GetModelClassName() %>
+	{
+		<% 
+		foreach (ColumnSchema column in TargetTable.Columns)
+ 		{
+		%>
+        /// <summary>
+        /// <%= column.Description %>
+        /// </summary>
+		public <%= GetPropertyType(column) %> <%= GetPropertyName(column) %>
+		{
+			 get;
+             set;
+		}
+            
+		<%
+		}
+		%>	
+	}
+}
+<script runat="template">
+public string GetModelClassName()
+{
+	return GetModelClassName(TargetTable);
+}
+
+public override string GetFileName()
+{
+	return this.GetModelClassName(this.TargetTable) + ".cs";
+}
+
+</script>

@@ -1,0 +1,43 @@
+﻿<%@ CodeTemplate Language="C#" ResponseEncoding="UTF-8" TargetLanguage="Text" Src="" Inherits="" Debug="False" Description="Template description here." 
+ Output="None"%>
+<%@ Property Name="SourceTables" Type="SchemaExplorer.TableSchemaCollection" Default="" Optional="False" Category=""%> 
+<%@ Register Name="SE" Template="CreatSingleTable.cst" MergeProperties="False" ExcludeProperties="" %> 
+<%@ Property Name="RootNamespace" Default="Net.Itcast.CN" Type="System.String" Optional="False"%>
+<%@ Assembly Name="SchemaExplorer" %> 
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %> 
+<%@ Import Namespace="System.Data" %> 
+<%@ Import Namespace="System.Collections" %> 
+<script runat="template">
+		private string _outputDirectory = String.Empty;
+		[Editor(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))] 
+		[Description("The directory to output the results to.")]
+		public string OutputDirectory 
+		{
+			get
+			{		
+				return _outputDirectory;
+			}
+			set
+			{
+				if (value != null && !value.EndsWith("\\"))
+				{
+					value += "\\";
+			    }
+				_outputDirectory = value;
+			} 
+		}
+</script>
+
+<% 
+foreach(TableSchema ts in SourceTables) 
+{ 
+SE s = new SE(); 
+   s.SourceTable = ts; 
+   s.RootNamespace = RootNamespace;
+   s.OutputDirectory = OutputDirectory;
+   s.Render(this.Response); 
+} 
+%> 
+<script runat="template"> 
+</script> 

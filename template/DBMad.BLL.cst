@@ -1,0 +1,174 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="UTF-8"	Src="ToolsCodeTemplate.cs" Inherits="ToolsCodeTemplate"%>
+<%@ Property Name="TargetTable" Type="SchemaExplorer.TableSchema" Category="Context" Description="TargetTable that the object is based on." %>
+
+<%@ Property Name="ModelsNamespace" Default="MyOffice.Models" Type="System.String" Category="Context" Description="TargetTable that the object is based on." %>
+<%@ Property Name="DALNamespace" Default="MyOffice.DAL" Type="System.String" Category="Context" Description="TargetTable that the object is based on." %>
+<%@ Property Name="BLLNamespace" Default="MyOffice.BLL" Type="System.String" Category="Context" Description="TargetTable that the object is based on." %>
+
+<%@ Property Name="BLLClassNameSurfix" Default="Manager" Type="System.String" Category="Context" Description="TargetTable that the object is based on." %>
+<%@ Property Name="DALClassNameSurfix" Default="Service" Type="System.String" Category="Context" Description="TargetTable that the object is based on." %>
+
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.ComponentModel;
+using <%= DALNamespace %>;
+using <%= ModelsNamespace %>;
+
+namespace <%= BLLNamespace %>
+{
+	[DataObject]
+    public partial class <%= GetBLLClassName() %>
+    {
+        #region 根据传入Model，并返回Model
+        /// <summary>
+        /// 根据传入Model，并返回是否插入成功。
+        /// </summary> 
+		[DataObjectMethod(DataObjectMethodType.Insert)]
+        public bool <%= GetModelClassName() %>Add(<%= GetModelClassName() %> <%= GetModelParamName() %>)
+        {
+            return new <%= GetDALClassName() %>().Add(<%= GetModelParamName() %>);
+        }
+        #endregion
+        
+        #region  根据Id删除数据记录
+        /// <summary>
+        /// 根据Id删除数据记录
+        /// </summary>
+		[DataObjectMethod(DataObjectMethodType.Delete)]
+        public int DeleteBy<%= GetPKPropertyName() %>(<%= GetPKPropertyType() %> <%= GetPKParamName() %>)
+        {
+            return new <%= GetDALClassName() %>().DeleteBy<%= GetPKPropertyName() %>(<%= GetPKParamName() %>);
+        }
+        #endregion
+		
+		
+        #region  根据字段名获取数据记录
+        /// <summary>
+        /// 根据字段名获取数据记录
+        /// </summary>
+	     public IEnumerable<<%= GetModelClassName() %>> GetBycolumnName(string columnName,string columnContent)
+		{
+			return new <%= GetDALClassName() %>().GetBycolumnName(columnName,columnContent);
+		}
+        #endregion
+        
+        #region 根据传入Model更新数据并返回更新后的Model
+        /// <summary>
+        /// 根据传入Model更新数据并返回更新后的Model
+        /// </summary>
+		[DataObjectMethod(DataObjectMethodType.Update)]
+		public int Update(<%= GetModelClassName() %> <%= GetModelParamName() %>)
+        {
+            return new <%= GetDALClassName() %>().Update(<%= GetModelParamName() %>);
+        }
+        #endregion
+
+        #region 传入Id，获得Model实体
+        /// <summary>
+        /// 传入Id，获得Model实体
+        /// </summary>
+		[DataObjectMethod(DataObjectMethodType.Select)]
+        public <%= GetModelClassName() %> GetBy<%= GetPKPropertyName() %>(<%= GetPKPropertyType() %> <%= GetPKParamName() %>)
+        {
+            return new <%= GetDALClassName() %>().GetBy<%= GetPKPropertyName() %>(<%= GetPKParamName() %>);
+        }
+        #endregion
+        
+        #region  获得总记录数
+        ///<summary>
+        /// 获得总记录数
+        ///</summary>
+		public int GetTotalCount()
+		{
+			return new <%= GetDALClassName() %>().GetTotalCount();
+		}
+		#endregion
+        
+        #region 获得分页记录集IEnumerable<>
+        ///<summary>
+        /// 获得分页记录集IEnumerable<>
+        ///</summary>  
+		[DataObjectMethod(DataObjectMethodType.Select)]
+		public IEnumerable<<%= GetModelClassName() %>> GetPagedData(int minrownum,int maxrownum)
+		{
+			return new <%= GetDALClassName() %>().GetPagedData(minrownum,maxrownum);
+		}
+		#endregion
+        
+        #region 获得总记录集IEnumerable<>
+        ///<summary>
+        /// 获得总记录集IEnumerable<>
+        ///</summary>  
+		[DataObjectMethod(DataObjectMethodType.Select)]
+		public IEnumerable<<%= GetModelClassName() %>> GetAll()
+		{
+			return new <%= GetDALClassName() %>().GetAll();
+		}
+        #endregion
+    }
+}
+<script runat="template">
+///////////////////////////////////////////////////////////////
+// CLASS NAME by Shen Bo
+///////////////////////////////////////////////////////////////
+public string GetBLLClassName()
+{
+	return 	GetModelClassName() + BLLClassNameSurfix;
+}
+public string GetDALClassName()
+{
+	return 	GetModelClassName() + DALClassNameSurfix;
+}
+public string GetModelMemberVarName()
+{
+	return GetModelParamName();
+}
+public string GetModelParamName()
+{
+	return MakeCamel(GetModelClassName());
+}
+public string GetModelClassName()
+{
+	return 	GetModelClassName(TargetTable);
+}
+
+///////////////////////////////////////////////////////////////
+// PRIMARY KEY TYPE by Shen Bo
+///////////////////////////////////////////////////////////////
+public string GetPKPropertyType()
+{
+	return 	GetPKType(TargetTable);
+}
+
+///////////////////////////////////////////////////////////////
+// PRIMARY KEY NAME by Shen Bo
+///////////////////////////////////////////////////////////////
+public string GetPKPropertyName()
+{
+	return MakePascal(GetPKName());
+}
+public string GetPKMemberVarName()
+{
+	return MakeCamel(GetPKName());	
+}
+public string GetPKParamName()
+{
+	return GetPKMemberVarName();	
+}
+public string GetPKName()
+{
+	return GetPKName(TargetTable);
+}
+
+public override string GetFileName()
+{
+	return this.GetBLLClassName() + ".cs";
+}
+
+</script>
